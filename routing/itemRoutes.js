@@ -1,17 +1,17 @@
 const express = require("express");
-const db = require("./fakeDb");
+const db = require("../fakeDb");
 
 const router = new express.Router();
-const { NotFoundError } = require("./expressError");
+const { NotFoundError } = require("../expressError");
 /** GET /items/ get list of shopping items */
 router.get("/", function (req, res, next) {
     return res.json({ items: db.items })
 })
 
 /**POST /items: accept JSON body, add item, and return it */
+//TODO - add 201 response status
 router.post("/", function (req, res, next) {
-    let name = req.body.name;
-    let price = req.body.price;
+    let {name, price} = req.body
     db.items.push({ name, price })
     return res.json({ items: db.items })
 })
@@ -23,6 +23,7 @@ router.get("/:name", function (req, res, next) {
         if (item.name === name) {
             return res.json(item)
         }
+        // TODO use .find on array instead of for loop
     }
     throw new NotFoundError('Item not found')
 });
@@ -40,7 +41,8 @@ router.patch("/:name", function (req, res, next) {
     }
     throw new NotFoundError('Item not found')
 })
-/**PATCH /items/:name: DELETE /items/:name: delete item: */
+
+/**DELETE /items/:name: DELETE /items/:name: delete item: */
 router.delete("/:name", function (req, res, next) {
     let name = req.params.name;
     for (let i = 0; i < db.items.length; i++) {
